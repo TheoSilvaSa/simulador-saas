@@ -1,32 +1,72 @@
-<div style="max-width: 800px; margin: auto; font-family: sans-serif; padding: 20px;">
+<div class="container">
   <h2>Simulador de Precificação SaaS</h2>
 
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-    <div><label>Custo Fixo Mensal (R$)</label><br><input type="number" [(ngModel)]="input.custoFixo"></div>
-    <div><label>Custo Variável Unitário (R$)</label><br><input type="number" [(ngModel)]="input.custoVariavel"></div>
-    <div><label>Preço Mensal (R$)</label><br><input type="number" [(ngModel)]="input.preco"></div>
-    <div><label>Quantidade de Clientes</label><br><input type="number" [(ngModel)]="input.clientes"></div>
-    <div><label>Taxa de Tributos (ex: 0.10 p/ 10%)</label><br><input type="number" step="0.01" [(ngModel)]="input.taxaTributos"></div>
-  </div>
+  <div class="layout-dashboard">
 
-  <button (click)="carregarExemplo()">Carregar Exemplo Base</button>
-  <button (click)="calcular()" style="margin-left: 10px; background-color: #0056b3; color: white;">Calcular</button>
+    <!-- Painel Esquerdo: Controles -->
+    <div class="painel-esquerdo">
+      <div class="input-group">
+        <label>Custo Fixo Mensal (R$)</label>
+        <input type="number" [(ngModel)]="input.custoFixo" placeholder="Ex: 3000">
+      </div>
+      <div class="input-group">
+        <label>Custo Variável Unitário (R$)</label>
+        <input type="number" [(ngModel)]="input.custoVariavel" placeholder="Ex: 10">
+      </div>
+      <div class="input-group">
+        <label>Preço Mensal (R$)</label>
+        <input type="number" [(ngModel)]="input.preco" placeholder="Ex: 50">
+      </div>
+      <div class="input-group">
+        <label>Quantidade de Clientes</label>
+        <input type="number" [(ngModel)]="input.clientes" placeholder="Ex: 100">
+      </div>
+      <div class="input-group">
+        <label>Taxa de Tributos (0.10 = 10%)</label>
+        <input type="number" step="0.01" [(ngModel)]="input.taxaTributos" placeholder="Ex: 0.1">
+      </div>
 
-  <hr>
+      <div class="botoes">
+        <button class="btn-primario" (click)="calcular()">Calcular Projeção</button>
+        <button class="btn-secundario" (click)="carregarExemplo()">Carregar Exemplo Base</button>
+      </div>
+    </div>
 
-  <div *ngIf="resultado">
-    <h3>Resultados</h3>
-    <div style="color: red; font-weight: bold;" *ngIf="resultado.mensagemAviso">{{ resultado.mensagemAviso }}</div>
+    <!-- Painel Direito: Resultados e Gráfico -->
+    <div class="painel-direito">
 
-    <ul *ngIf="!resultado.mensagemAviso">
-      <li><strong>Receita:</strong> R$ {{ resultado.receita }}</li>
-      <li><strong>Tributos:</strong> R$ {{ resultado.tributos }}</li>
-      <li><strong>Resultado Operacional:</strong> R$ {{ resultado.resultado }}</li>
-      <li><strong>Margem:</strong> {{ resultado.margem }}%</li>
-      <li><strong>Ponto de Equilíbrio:</strong> {{ resultado.clientesEquilibrio }} clientes</li>
-    </ul>
+      <!-- Mostra isso apenas se houver resultado -->
+      <div *ngIf="resultado" class="area-resultados">
+        <div class="cabecalho-resultados">
+          <h3>Visão Geral Financeira</h3>
+          <button class="btn-exportar" (click)="exportarCSV()">Exportar CSV</button>
+        </div>
 
-    <button (click)="exportarCSV()">Exportar para CSV</button>
-    <canvas #graficoCanvas></canvas>
+        <div class="aviso" *ngIf="resultado.mensagemAviso">{{ resultado.mensagemAviso }}</div>
+
+        <ul class="resultados-lista" *ngIf="!resultado.mensagemAviso">
+          <li><strong>Receita</strong> <span class="valor">R$ {{ resultado.receita }}</span></li>
+          <li><strong>Tributos</strong> <span class="valor">R$ {{ resultado.tributos }}</span></li>
+          <li>
+            <strong>Operacional</strong>
+            <span class="valor" [ngStyle]="{'color': resultado.resultado >= 0 ? '#38a169' : '#e53e3e'}">
+              R$ {{ resultado.resultado }}
+            </span>
+          </li>
+          <li><strong>Margem</strong> <span class="valor">{{ resultado.margem | number:'1.0-2' }}%</span></li>
+          <li><strong>Equilíbrio</strong> <span class="valor">{{ resultado.clientesEquilibrio }} cli.</span></li>
+        </ul>
+
+        <div class="grafico-container">
+          <canvas #graficoCanvas></canvas>
+        </div>
+      </div>
+
+      <!-- Estado vazio antes de calcular -->
+      <div *ngIf="!resultado" class="estado-vazio">
+        Preencha os valores ao lado e clique em calcular para gerar a projeção.
+      </div>
+
+    </div>
   </div>
 </div>
